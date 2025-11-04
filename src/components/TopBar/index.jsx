@@ -17,14 +17,20 @@ function TopBar() {
     const users = models.userListModel();
     const parts = path.split("/");
 
-    const page = parts[1]; // "users" hoặc "photos"
-    const userId = parts[2]; // ID của user
+    const page = parts[1];
+    const userId = parts[2];
 
     const user = users.find((u) => u._id === userId);
-    const name = `${user.first_name} ${user.last_name}`;
-    if (page === "photos") setContextText(`Photos of ${name}`);
-    else if (page === "users") setContextText(name);
-    else setContextText("");
+
+    if (user) {
+      const name = `${user.first_name} ${user.last_name}`;
+      if (page === "photos") setContextText(`Photos of ${name}`);
+      else if (page === "users") setContextText(name);
+      else setContextText("");
+    } else {
+      // Không tìm thấy user — reset context text
+      setContextText("");
+    }
   }, [location]);
 
   return (
