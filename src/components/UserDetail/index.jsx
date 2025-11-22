@@ -1,25 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Typography } from "@mui/material";
+import { useParams, Link } from "react-router-dom";
+import fetchModel from "../../lib/fetchModelData";
 
 import "./styles.css";
-import { useParams, Link } from "react-router-dom";
 
-import models from "../../modelData/models";
-/**
- * Define UserDetail, a React component of Project 4.
- */
 function UserDetail() {
   const { userId } = useParams();
-  const user = models.userModel(userId);
+  const [user, setUser] = useState(null); 
+  const [loading, setLoading] = useState(true); 
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const data = await fetchModel(`/api/user/${userId}`);
+        setUser(data || null); 
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadUser();
+  }, [userId]);
+
+  if (loading) {
+    return <Typography>Loading user...</Typography>;
+  }
+
+  if (!user) {
+    return <Typography>User not found.</Typography>; 
+  }
+
   return (
     <>
-      {/* <Typography variant="body1">
-            This should be the UserDetail view of the PhotoShare app. Since it is
-            invoked from React Router the params from the route will be in property match.
-            So this should show details of user: {user.userId}.
-            You can fetch the model for the user from models.userModel.
-          </Typography> */}
-      <Typography variant="body1">
+      <Typography variant="h6">
         {user.first_name} {user.last_name}
       </Typography>
       <Typography variant="body2">Location: {user.location}</Typography>
